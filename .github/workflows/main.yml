@@ -1,0 +1,38 @@
+name: Auto Approve PRs for /dev/merit Only
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  auto-approve:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get list of changed files
+        id: changed-files
+        run: |
+          echo "CHANGED_FILES=$(gh pr diff ${{ github.event.pull_request.number }} --name-only | xargs)" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if all files are in /dev/merit
+        id: verify
+        run: |
+          BAD_FILE=0
+          for file in $CHANGED_FILES; do
+            if [[ "$file" != dev/merit/* ]]; then
+              echo "Found non-merit file: $file"
+              BAD_FILE=1
+              break
+            fi
+          done
+          echo "SELF_APPROVE=$([ $BAD_FILE -eq 0 ] && echo 'true' || echo 'false')" >> $GITHUB_ENV
+
+      - name: Auto approve PR
+        if: env.SELF_APPROVE == 'true'
+        uses: peter-evans/approve-pull-request@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
