@@ -1,4 +1,4 @@
-name: Auto Approve PRs for /dev Only
+name: Auto Approve PRs for /dev 
 
 on:
   pull_request:
@@ -18,7 +18,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Check if all files are in /dev/
+      - name: Check if all files are in /dev
         id: verify
         run: |
           BAD_FILE=0
