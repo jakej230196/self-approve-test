@@ -1,4 +1,4 @@
-name: Auto Approve PRs for /dev/merit Only
+name: Auto Approve PRs for /dev Only
 
 on:
   pull_request:
@@ -18,13 +18,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Check if all files are in /dev/merit
+      - name: Check if all files are in /dev/
         id: verify
         run: |
           BAD_FILE=0
           for file in $CHANGED_FILES; do
-            if [[ "$file" != dev/merit/* ]]; then
-              echo "Found non-merit file: $file"
+            if [[ "$file" != dev/* ]]; then
+              echo "Found non-dev file: $file"
               BAD_FILE=1
               break
             fi
